@@ -26,7 +26,20 @@ library ieee;
 
 
 entity top_basys3 is
--- TODO
+    port(
+        -- inputs
+        clk     :   in std_logic; -- native 100MHz FPGA clock
+        sw      :   in std_logic_vector(7 downto 0); -- operands and opcode
+        btnU    :   in std_logic; -- reset
+        btnC    :   in std_logic; -- fsm cycle
+        
+        -- outputs
+        led :   out std_logic_vector(15 downto 0);
+        -- 7-segment display segments (active-low cathodes)
+        seg :   out std_logic_vector(6 downto 0);
+        -- 7-segment display active-low enables (anodes)
+        an  :   out std_logic_vector(3 downto 0)
+    );
 end top_basys3;
 
 architecture top_basys3_arch of top_basys3 is 
