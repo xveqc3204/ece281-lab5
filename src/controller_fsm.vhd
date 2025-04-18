@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 04/18/2025 02:50:18 PM
+-- Create Date: 04/18/2025 02:42:49 PM
 -- Design Name: 
--- Module Name: ALU - Behavioral
+-- Module Name: controller_fsm - FSM
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -31,17 +31,15 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity ALU is
-    Port ( i_A : in STD_LOGIC_VECTOR (7 downto 0);
-           i_B : in STD_LOGIC_VECTOR (7 downto 0);
-           i_op : in STD_LOGIC_VECTOR (2 downto 0);
-           o_result : out STD_LOGIC_VECTOR (7 downto 0);
-           o_flags : out STD_LOGIC_VECTOR (3 downto 0));
-end ALU;
+entity controller_fsm is
+    Port ( i_reset : in STD_LOGIC;
+           i_adv : in STD_LOGIC;
+           o_cycle : out STD_LOGIC_VECTOR (3 downto 0));
+end controller_fsm;
 
-architecture Behavioral of ALU is
+architecture FSM of controller_fsm is
 
 begin
 
 
-end Behavioral;
+end FSM;
