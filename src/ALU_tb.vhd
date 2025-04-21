@@ -132,14 +132,14 @@ begin
         ----------------------------------------------------------------------------
         --  6. SUB - negative result with overflow (-100 - 30 = -130)
         ----------------------------------------------------------------------------
-        w_A  <= to_vec(100);
+        w_A  <= to_vec(156);
         w_B  <= to_vec(30);
         w_op <= OP_SUB;
         wait for k_step;
-
+ 
         assert w_result = x"7E"              -- incorrectly = 126
             report "SUB 100-30: wrong result" severity error;
-        assert w_flags  = "1011"             -- N=0 Z=0 C=1 V=1
+        assert w_flags  = "0011"             -- N=0 Z=0 C=1 V=1
             report "SUB 100-30: wrong NZCV" severity error;
 
         ----------------------------------------------------------------------------
