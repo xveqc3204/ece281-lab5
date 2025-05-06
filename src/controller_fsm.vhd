@@ -38,8 +38,22 @@ entity controller_fsm is
 end controller_fsm;
 
 architecture FSM of controller_fsm is
-
+    signal f_state : STD_LOGIC_VECTOR (3 downto 0) := "0001";
+    signal f_next_state : STD_LOGIC_VECTOR (3 downto 0) := "0001";
 begin
-
-
+    f_next_state(0) <= (f_state(0) and not i_adv) or (f_state(3) and i_adv);
+    f_next_state(1) <= (f_state(1) and not i_adv) or (f_state(0) and i_adv);
+    f_next_state(2) <= (f_state(2) and not i_adv) or (f_state(1) and i_adv);
+    f_next_state(3) <= (f_state(3) and not i_adv) or (f_state(2) and i_adv);
+    
+    process(i_reset, i_adv)
+    begin
+        if i_reset = '1' then
+            f_state <= "0001";
+        elsif rising_edge(i_adv) then
+            f_state <= f_next_state;
+        end if;
+    end process;
+    
+    o_cycle <= f_state;
 end FSM;
