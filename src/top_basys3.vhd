@@ -112,11 +112,11 @@ architecture top_basys3_arch of top_basys3 is
     signal w_B : std_logic_vector(7 downto 0);
     signal w_op : std_logic_vector(2 downto 0);
     signal w_result : std_logic_vector(7 downto 0);
-    signal w_flags : std_logic_vector(3 downto 0);
     
     -- twos_comp
     signal w_bin : std_logic_vector(7 downto 0);
-    signal w_sign : std_logic;
+    signal w_sign : std_logic_vector(3 downto 0);
+    signal w_sign_bit : std_logic;
     signal w_hund : std_logic_vector(3 downto 0);
     signal w_tens : std_logic_vector(3 downto 0);
     signal w_ones : std_logic_vector(3 downto 0);
@@ -128,11 +128,13 @@ architecture top_basys3_arch of top_basys3 is
     -- misc
     signal w_seg_sign : std_logic_vector(6 downto 0);
     signal w_seg : std_logic_vector(6 downto 0);
-   
+    signal w_btnU : std_logic;
   
 begin
     
 	-- PORT MAPS ----------------------------------------
+	
+	w_btnU <= btnU;
 
     clock_divider_Final: clock_divider
     generic map (
@@ -140,13 +142,13 @@ begin
     )
     port map (
         i_clk => clk,
-        i_reset => btnU,
+        i_reset => w_btnU,
         o_clk => w_clk   
     );
     
     controller_fsm_Final : controller_fsm 
     port map (
-        i_reset => btnU,
+        i_reset => w_btnU,
         i_adv => btnC,
         o_cycle => w_cycle
     );
@@ -155,29 +157,29 @@ begin
     port map (
         i_A => w_A,
         i_B => w_B,
-        i_op => w_op,
+        i_op => sw(2 downto 0),
         o_result => w_result,
-        o_flags => w_flags
+        o_flags => led(15 downto 12)
     );
     
     twos_comp_Final: twos_comp
     port map (
         i_bin => w_bin,
-        o_sign => w_sign,
+        o_sign => w_sign_bit,
         o_hund => w_hund,
         o_tens => w_tens,
         o_ones => w_ones
     );
     
+    w_sign <= "1111";
     TDM4_Final: TDM4
     generic map (
         k_WIDTH => 4
     )
     port map (
         i_clk => w_clk,
-        i_reset => btnU,
-        i_D3(0) => w_sign,
-        i_D3(3 downto 1) => "000",
+        i_reset => w_btnU,
+        i_D3 => w_sign,
         i_D2 => w_hund,
         i_D1 => w_tens,
         i_D0 => w_ones,
@@ -193,14 +195,14 @@ begin
 	
 	-- CONCURRENT STATEMENTS ----------------------------
     with w_cycle select
-        w_bin <= sw                when "0010", -- load and display operand A
-                 sw                when "0100", -- load and display operand B
+        w_bin <= w_A               when "0010", -- load and display operand A
+                 w_B               when "0100", -- load and display operand B
                  w_result          when "1000", -- display ALU result
-                 (others => '0')   when others; -- clear display otherwise
+                 "00000000"        when others; -- clear display otherwise
     
     w_op <= sw(2 downto 0) when w_cycle = "1000" else "000";    
     
-    with w_sign select
+    with w_sign_bit select
         w_seg_sign <= "1111111" when '0',
                       "0111111" when others;
                 
@@ -222,8 +224,7 @@ begin
         end if;
     end process register_B;
 	
-    led(3 downto 0) <= w_cycle;        -- FSM state
-    led(15 downto 12) <= w_flags;      -- ALU flags
+    led(3 downto 0) <= w_cycle;      
     led(11 downto 4) <= (others => '0');  -- ground unused LEDs
 	
 	an <= w_sel;
